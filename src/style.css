@@ -80,3 +80,8 @@ dt label { cursor: pointer; }
 .ok { color: var(--accent); font-weight: 600; }
 
 [hidden] { display: none !important; }
+
+.mapbox { margin: 16px 0; padding: 12px; border: 1px solid var(--line); border-radius: 8px; }
+.mapbox h2 { margin: 0 0 4px; font-size: 1.05rem; }
+.coords { margin: 0; font-weight: 600; color: var(--danger); }
+.map { height: 280px; margin-top: 12px; border-radius: 8px; }

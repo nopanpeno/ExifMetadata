@@ -21,3 +21,11 @@ npm run build   # hasil di dist/
 - **Hapus terpilih** (JPEG): buang field EXIF yang dicentang. XMP dan IPTC hanya hilang lewat Hapus semua.
 - **PNG, WebP**: gambar ulang lewat canvas. WebP bisa sedikit turun kualitas.
 - Setelah proses, alat membaca ulang hasilnya dan menampilkan metadata yang masih tersisa.
+
+## Peta GPS
+
+Mati bawaan. Jika foto punya GPS, tombol "Nyalakan peta" memuat Leaflet dan ubin OpenStreetMap. Hanya saat itu browser menghubungi `tile.openstreetmap.org`, dan yang terkirim hanya nomor ubin, bukan foto.
+
+## Foto contoh untuk tes
+
+`python3 test/fixtures/make.py` (butuh Pillow) membuat ulang foto di `test/fixtures/`.
