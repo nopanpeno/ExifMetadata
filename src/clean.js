@@ -9,9 +9,30 @@ export function cleanName(name, ext) {
   return `${base}-bersih.${ext}`;
 }
 
+function formatFromBytes(bytes) {
+  if (isJpeg(bytes)) return 'jpeg';
+  if (bytes.length >= 8 && [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a].every((b, i) => bytes[i] === b)) {
+    return 'png';
+  }
+  if (
+    bytes.length >= 12 &&
+    String.fromCharCode(...bytes.subarray(0, 4)) === 'RIFF' &&
+    String.fromCharCode(...bytes.subarray(8, 12)) === 'WEBP'
+  ) {
+    return 'webp';
+  }
+  return null;
+}
+
+// Kenali format dari signature file agar MIME/ekstensi yang keliru tidak
+// membuat format yang belum didukung masuk ke jalur pembersihan canvas.
+export async function detectFormat(file) {
+  return formatFromBytes(new Uint8Array(await file.slice(0, 12).arrayBuffer()));
+}
+
 // PNG, WebP: gambar ulang lewat canvas. Metadata hilang, kualitas WebP bisa turun.
-async function canvasClean(file) {
-  const type = file.type === 'image/webp' ? 'image/webp' : 'image/png';
+async function canvasClean(file, format) {
+  const type = format === 'webp' ? 'image/webp' : 'image/png';
   let bmp;
   try {
     bmp = await createImageBitmap(file);
@@ -31,14 +52,16 @@ async function canvasClean(file) {
 // Hapus semua metadata. Hasil: { blob, ext, lossy }
 export async function cleanAll(file, { keepOrientation = true } = {}) {
   const bytes = await fileBytes(file);
-  if (isJpeg(bytes)) {
+  const format = formatFromBytes(bytes.subarray(0, 12));
+  if (format === 'jpeg') {
     return {
       blob: new Blob([cleanAllJpeg(bytes, { keepOrientation })], { type: 'image/jpeg' }),
       ext: 'jpg',
       lossy: false,
     };
   }
-  return canvasClean(file);
+  if (!format) throw new Error('Format belum didukung. Pilih JPEG, PNG, atau WebP.');
+  return canvasClean(file, format);
 }
 
 // Hapus field terpilih (JPEG saja).

@@ -1,7 +1,7 @@
 import { readExif } from './exif-read.js';
 import { groupFields, hasGps } from './exif-groups.js';
 import { showMap, formatCoords } from './map.js';
-import { cleanAll, cleanSelected, removableKeys, cleanName } from './clean.js';
+import { cleanAll, cleanSelected, removableKeys, cleanName, detectFormat } from './clean.js';
 import { isJpeg } from './jpeg.js';
 
 const $ = (id) => document.getElementById(id);
@@ -131,6 +131,12 @@ async function handle(file) {
   result.hidden = true;
   done.hidden = true;
   try {
+    const format = await detectFormat(file);
+    if (!format) {
+      state.file = null;
+      setStatus('Format belum didukung. Pilih JPEG, PNG, atau WebP.');
+      return;
+    }
     const [data, removable, head] = await Promise.all([
       readExif(file),
       removableKeys(file),
@@ -178,7 +184,7 @@ async function finish(res) {
   const data = await readExif(res.blob);
   renderGroups(left, groupFields(data), { selectable: false });
   if (!groupFields(data).length) {
-    left.replaceChildren(el('p', 'ok', 'Tidak ada metadata yang terbaca. Foto bersih.'));
+    left.replaceChildren(el('p', 'ok', 'Tidak ada EXIF yang terbaca oleh aplikasi. Untuk privasi sensitif, verifikasi file dengan alat metadata independen.'));
   }
   done.hidden = false;
   const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
