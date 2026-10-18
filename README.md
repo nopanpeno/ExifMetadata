@@ -20,7 +20,8 @@ npm run build   # hasil di dist/
 - **JPEG**: segmen metadata dibuang langsung dari file (EXIF, GPS, XMP, IPTC, komentar, thumbnail). Piksel tidak berubah. Orientasi foto bisa dipertahankan.
 - **Hapus terpilih** (JPEG): buang field EXIF yang dicentang. XMP dan IPTC hanya hilang lewat Hapus semua.
 - **PNG, WebP**: gambar ulang lewat canvas. WebP bisa sedikit turun kualitas.
-- Setelah proses, alat membaca ulang hasilnya dan menampilkan metadata yang masih tersisa.
+- Hanya JPEG, PNG, dan WebP yang diterima. HEIC dan TIFF belum didukung.
+- Setelah proses, alat membaca ulang EXIF dengan `exifr`; ini bukan jaminan bahwa setiap jenis metadata lain sudah hilang. Untuk kebutuhan privasi sensitif, verifikasi hasil dengan alat metadata independen.
 
 ## Peta GPS
 
