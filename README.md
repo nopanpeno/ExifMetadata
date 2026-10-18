@@ -23,9 +23,13 @@ npm run build   # hasil di dist/
 - Hanya JPEG, PNG, dan WebP yang diterima. HEIC dan TIFF belum didukung.
 - Setelah proses, alat memindai struktur file hasil (segmen JPEG, chunk PNG dan WebP) untuk mencari wadah metadata yang tersisa, lalu membaca ulang EXIF dengan `exifr`; ini bukan jaminan bahwa setiap jenis metadata lain sudah hilang. Untuk kebutuhan privasi sensitif, verifikasi hasil dengan alat metadata independen.
 
-## Peta GPS
+## GPS dan peta
 
-Mati bawaan. Jika foto punya GPS, tombol "Nyalakan peta" memuat Leaflet dan ubin OpenStreetMap. Hanya saat itu browser menghubungi `tile.openstreetmap.org`, dan yang terkirim hanya nomor ubin, bukan foto.
+Jika foto memuat lokasi, panel merah "Foto ini memuat lokasi" muncul paling atas: koordinat, ketinggian, arah kamera, kecepatan, akurasi, dan waktu GPS (yang ada di file), tombol salin koordinat, serta tautan buka di OpenStreetMap atau Google Maps. Tautan baru mengirim koordinat ke situs itu saat diklik.
+
+Peta di halaman mati bawaan. Tombol "Tampilkan di peta" memuat Leaflet dan ubin OpenStreetMap, dengan lingkaran akurasi dan skala. Hanya saat itu browser menghubungi `tile.openstreetmap.org`, dan yang terkirim hanya nomor ubin, bukan foto.
+
+Setelah pembersihan, jika file hasil masih memuat lokasi, panel Hasil memperingatkan lengkap dengan koordinatnya.
 
 ## Foto contoh untuk tes
 

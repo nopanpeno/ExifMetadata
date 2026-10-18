@@ -34,3 +34,13 @@ sr = Image.new('RGB', (40, 30), 'blue')
 ex = Image.Exif()
 ex[0x010F] = 'RotMake'; ex[0x0112] = 6
 sr.save(f'{d}/sample-rot.jpg', exif=ex)
+
+# 6) gps-detail.jpg: GPS lengkap (ketinggian, arah, kecepatan, akurasi, waktu)
+# Nilai pecahan harus RATIONAL (IFDRational); float biasa ditulis sebagai DOUBLE, tipe yang tidak sah di EXIF.
+from PIL.TiffImagePlugin import IFDRational as R
+im6 = Image.effect_noise((64, 48), 80).convert('RGB')
+ex = Image.Exif()
+ex[0x010F] = 'GpsMake'
+ex[0x8825] = {1: 'S', 2: (R(6), R(12), R(0)), 3: 'E', 4: (R(106), R(48), R(0)), 5: 0, 6: R(1234, 10),
+              7: (R(3), R(4), R(5)), 12: 'K', 13: R(40), 16: 'T', 17: R(90), 29: '2026:01:02', 31: R(5)}
+im6.save(f'{d}/gps-detail.jpg', exif=ex, quality=90)

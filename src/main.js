@@ -1,6 +1,7 @@
 import { readExif } from './exif-read.js';
 import { groupFields, hasGps } from './exif-groups.js';
 import { showMap, formatCoords } from './map.js';
+import { gpsDetails, mapLinks, decimalText, accuracyMeters } from './gps.js';
 import { cleanAll, cleanSelected, removableKeys, cleanName, detectFormat } from './clean.js';
 import { isJpeg } from './jpeg.js';
 import { scanStructure } from './scan.js';
@@ -28,6 +29,8 @@ const mapbox = $('mapbox');
 const mapEl = $('map');
 const btnMap = $('btn-map');
 const coordsEl = $('coords');
+const gpsDetailsEl = $('gps-details');
+const btnCopy = $('btn-copy');
 
 let destroyMap = null;
 let gps = null;
@@ -36,9 +39,34 @@ function resetMap() {
   destroyMap?.();
   destroyMap = null;
   mapEl.hidden = true;
-  btnMap.textContent = 'Nyalakan peta';
+  btnMap.textContent = 'Tampilkan di peta';
   btnMap.disabled = false;
 }
+
+function renderGps(data) {
+  coordsEl.textContent = formatCoords(gps.lat, gps.lon);
+  gpsDetailsEl.replaceChildren(
+    ...gpsDetails(data).map((r) => {
+      const row = el('div', 'row');
+      row.append(el('dt', '', r.label), el('dd', '', r.value));
+      return row;
+    }),
+  );
+  const links = mapLinks(gps.lat, gps.lon);
+  $('link-osm').href = links.osm;
+  $('link-gmaps').href = links.google;
+  btnCopy.textContent = 'Salin koordinat';
+}
+
+btnCopy.addEventListener('click', async () => {
+  const text = decimalText(gps.lat, gps.lon);
+  try {
+    await navigator.clipboard.writeText(text);
+    btnCopy.textContent = 'Tersalin';
+  } catch {
+    btnCopy.textContent = text; // clipboard ditolak: tampilkan teks supaya bisa disalin manual
+  }
+});
 
 btnMap.addEventListener('click', async () => {
   if (destroyMap) return resetMap();
@@ -46,7 +74,7 @@ btnMap.addEventListener('click', async () => {
   btnMap.textContent = 'Memuat peta...';
   try {
     mapEl.hidden = false;
-    destroyMap = await showMap(mapEl, gps.lat, gps.lon);
+    destroyMap = await showMap(mapEl, gps.lat, gps.lon, { accuracy: gps.accuracy });
     btnMap.textContent = 'Matikan peta';
   } catch (err) {
     console.error(err);
@@ -153,14 +181,17 @@ async function handle(file) {
       el('p', 'fsize', `${(file.size / 1024 / 1024).toFixed(2)} MB`),
     );
     resetMap();
-    gps = hasGps(data) ? { lat: data.latitude, lon: data.longitude } : null;
+    gps = hasGps(data) ? { lat: data.latitude, lon: data.longitude, accuracy: accuracyMeters(data) } : null;
     mapbox.hidden = !gps;
-    if (gps) coordsEl.textContent = formatCoords(gps.lat, gps.lon);
+    if (gps) renderGps(data);
     renderGroups(groupsEl, groupFields(data), { selectable: state.jpeg });
     orientWrap.hidden = !state.jpeg;
     btnSel.hidden = btnSens.hidden = !state.jpeg;
+    const groupsNow = groupFields(data);
     note.textContent = state.jpeg
-      ? 'Field XMP dan IPTC tidak bisa dicentang satu per satu. Pakai "Hapus semua" untuk membuangnya.'
+      ? groupsNow.length && removable.size === 0
+        ? 'Field di file ini tidak bisa dihapus satu per satu (EXIF tidak terbaca oleh pembersih, atau hanya XMP/IPTC). Pakai "Hapus semua".'
+        : 'Field XMP dan IPTC tidak bisa dicentang satu per satu. Pakai "Hapus semua" untuk membuangnya.'
       : 'Format ini hanya mendukung "Hapus semua" lewat gambar ulang. Hasil WebP bisa sedikit turun kualitas.';
     updateSelButton();
     result.hidden = false;
@@ -209,6 +240,11 @@ async function finish(res) {
         : 'Piksel foto tidak berubah.');
   renderScan(scanStructure(new Uint8Array(await res.blob.arrayBuffer())));
   const data = await readExif(res.blob);
+  if (hasGps(data)) {
+    scanEl.prepend(
+      el('p', 'warn', `Foto hasil masih memuat lokasi (${formatCoords(data.latitude, data.longitude)}). Centang field GPS lalu hapus, atau pakai "Hapus semua".`),
+    );
+  }
   renderGroups(left, groupFields(data), { selectable: false });
   if (!groupFields(data).length) {
     left.replaceChildren(el('p', 'ok', 'Tidak ada EXIF yang terbaca oleh aplikasi. Untuk privasi sensitif, verifikasi file dengan alat metadata independen.'));

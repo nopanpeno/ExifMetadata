@@ -28,11 +28,18 @@
           <img id="preview" alt="Pratinjau foto" />
           <div id="meta"></div>
         </div>
-        <section id="mapbox" class="mapbox" hidden>
-          <h2>Lokasi foto</h2>
+        <section id="mapbox" class="mapbox" aria-labelledby="gps-title" hidden>
+          <h2 id="gps-title"><svg aria-hidden="true" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg> Foto ini memuat lokasi</h2>
           <p id="coords" class="coords"></p>
-          <p class="note">Peta dimatikan secara bawaan. Jika dinyalakan, browser meminta ubin peta ke OpenStreetMap, jadi mereka bisa tahu area yang kamu lihat. Fotonya tidak dikirim.</p>
-          <button id="btn-map" type="button">Nyalakan peta</button>
+          <dl id="gps-details" class="gps-details"></dl>
+          <div class="gps-actions">
+            <button id="btn-copy" type="button">Salin koordinat</button>
+            <a id="link-osm" class="btn plain" target="_blank" rel="noopener noreferrer">Buka di OpenStreetMap</a>
+            <a id="link-gmaps" class="btn plain" target="_blank" rel="noopener noreferrer">Buka di Google Maps</a>
+          </div>
+          <p class="note">Kedua tautan membuka situs luar dan mengirim koordinat ke sana saat diklik.</p>
+          <button id="btn-map" class="primary" type="button">Tampilkan di peta</button>
+          <p class="note" id="map-note">Peta mati sampai kamu menyalakannya. Saat menyala, browser meminta ubin peta ke OpenStreetMap, jadi mereka bisa tahu area yang kamu lihat. Fotonya tidak dikirim.</p>
           <div id="map" class="map" hidden></div>
         </section>
         <div id="toolbar" class="toolbar">

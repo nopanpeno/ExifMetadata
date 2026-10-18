@@ -8,7 +8,7 @@ export function formatCoords(lat, lon) {
 }
 
 // Kembalikan fungsi untuk mematikan peta.
-export async function showMap(container, lat, lon) {
+export async function showMap(container, lat, lon, { accuracy = null } = {}) {
   const [{ default: L }] = await Promise.all([
     import('leaflet'),
     import('leaflet/dist/leaflet.css'),
@@ -18,6 +18,8 @@ export async function showMap(container, lat, lon) {
     maxZoom: 19,
     attribution: '&copy; kontributor <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
   }).addTo(map);
+  L.control.scale({ imperial: false }).addTo(map);
+  if (accuracy) L.circle([lat, lon], { radius: accuracy, color: '#17695a', weight: 2, fillOpacity: 0.12 }).addTo(map);
   L.circleMarker([lat, lon], { radius: 9, color: '#b3261e', fillColor: '#b3261e', fillOpacity: 0.6 }).addTo(map);
   return () => map.remove();
 }
