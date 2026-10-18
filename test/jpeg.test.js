@@ -74,6 +74,14 @@ describe('removeFieldsJpeg', () => {
     expect(data.Make).toBe('TestMake');
     expect(hasGps(data)).toBe(true);
   });
+  it('nama exifr (ISO, tanggal) dipetakan ke tag piexif', async () => {
+    const names = listRemovable(sample);
+    expect(names.has('ISO')).toBe(true);
+    const out = removeFieldsJpeg(sample, ['ISO']);
+    const data = await readExif(out);
+    expect(data.ISO).toBeUndefined();
+    expect(data.Make).toBe('TestMake');
+  });
   it('buang latitude menghapus lokasi', async () => {
     const data = await readExif(removeFieldsJpeg(sample, ['latitude']));
     expect(hasGps(data)).toBe(false);

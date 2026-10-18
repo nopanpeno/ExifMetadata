@@ -28,7 +28,12 @@ export function isSensitive(key) {
 
 export function formatValue(v) {
   if (v === null || v === undefined) return '';
-  if (v instanceof Date) return Number.isNaN(v.getTime()) ? '' : v.toISOString();
+  if (v instanceof Date) {
+    if (Number.isNaN(v.getTime())) return '';
+    // exifr membuat Date lokal dari teks tanpa zona; tampilkan apa adanya, bukan UTC.
+    const p = (n) => String(n).padStart(2, '0');
+    return `${v.getFullYear()}-${p(v.getMonth() + 1)}-${p(v.getDate())} ${p(v.getHours())}:${p(v.getMinutes())}:${p(v.getSeconds())}`;
+  }
   if (v instanceof Uint8Array || v instanceof ArrayBuffer) {
     return `[data biner ${v.byteLength} byte]`;
   }

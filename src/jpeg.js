@@ -107,6 +107,16 @@ export function cleanAllJpeg(u8, { keepOrientation = true } = {}) {
 const IFDS = ['0th', 'Exif', 'GPS', 'Interop'];
 const LATLON = new Set(['GPSLatitude', 'GPSLatitudeRef', 'GPSLongitude', 'GPSLongitudeRef']);
 
+// Nama exifr (tampil di UI) -> nama piexifjs (tag di file) bila berbeda.
+const ALIAS = {
+  ISO: 'ISOSpeedRatings',
+  ExifImageWidth: 'PixelXDimension',
+  ExifImageHeight: 'PixelYDimension',
+  ModifyDate: 'DateTime',
+  CreateDate: 'DateTimeDigitized',
+  ExposureCompensation: 'ExposureBiasValue',
+};
+
 function nameOf(ifd, id) {
   return piexif.TAGS[ifd]?.[id]?.name;
 }
@@ -123,6 +133,7 @@ export function listRemovable(u8) {
         if (n) names.add(n);
       }
     }
+    for (const [shown, tag] of Object.entries(ALIAS)) if (names.has(tag)) names.add(shown);
     if ([...LATLON].some((n) => names.has(n))) {
       names.add('latitude');
       names.add('longitude');
@@ -139,6 +150,7 @@ export function removeFieldsJpeg(u8, keys) {
   if (!isJpeg(u8)) throw new Error('Bukan JPEG');
   const sel = new Set(keys);
   if (sel.has('latitude') || sel.has('longitude')) LATLON.forEach((n) => sel.add(n));
+  for (const [shown, tag] of Object.entries(ALIAS)) if (sel.has(shown)) sel.add(tag);
   const bin = toBin(u8);
   const ex = piexif.load(bin);
   for (const ifd of IFDS) {
