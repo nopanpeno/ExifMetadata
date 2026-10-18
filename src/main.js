@@ -3,6 +3,7 @@ import { groupFields, hasGps } from './exif-groups.js';
 import { showMap, formatCoords } from './map.js';
 import { cleanAll, cleanSelected, removableKeys, cleanName, detectFormat } from './clean.js';
 import { isJpeg } from './jpeg.js';
+import { scanStructure } from './scan.js';
 
 const $ = (id) => document.getElementById(id);
 const dropzone = $('dropzone');
@@ -22,6 +23,7 @@ const done = $('done');
 const doneInfo = $('done-info');
 const download = $('download');
 const left = $('left');
+const scanEl = $('scan');
 const mapbox = $('mapbox');
 const mapEl = $('map');
 const btnMap = $('btn-map');
@@ -169,6 +171,30 @@ async function handle(file) {
   }
 }
 
+function fmtBytes(n) {
+  return n < 1024 ? `${n} B` : `${(n / 1024).toFixed(1)} kB`;
+}
+
+function renderScan(r) {
+  scanEl.replaceChildren();
+  if (r.error) {
+    scanEl.append(el('p', 'warn', 'Struktur file tidak bisa dipindai penuh. Anggap hasil ini belum terverifikasi.'));
+  } else if (!r.found.length) {
+    scanEl.append(el('p', 'ok', 'Tidak ada wadah metadata di struktur file: EXIF, XMP, IPTC, komentar, dan data tambahan tidak ditemukan.'));
+  } else {
+    scanEl.append(el('p', 'warn', `Masih ada ${r.found.length} wadah metadata di file ini:`));
+    const ul = el('ul', 'scanlist');
+    for (const f of r.found) ul.append(el('li', '', `${f.label}, ${fmtBytes(f.bytes)}`));
+    scanEl.append(ul);
+  }
+  if (r.kept.length) {
+    scanEl.append(el('p', 'note', `Sengaja dipertahankan: ${r.kept.map((k) => k.label).join(', ')}.`));
+  }
+  scanEl.append(
+    el('p', 'note', 'Pemindai mengenali wadah metadata yang umum. Isi piksel, misalnya watermark tak kasat mata, tidak diperiksa.'),
+  );
+}
+
 async function finish(res) {
   const url = swapUrl('out', res.blob);
   download.href = url;
@@ -181,6 +207,7 @@ async function finish(res) {
       : res.redrawn
         ? 'Dibuat dengan gambar ulang. PNG tetap tanpa kehilangan kualitas.'
         : 'Piksel foto tidak berubah.');
+  renderScan(scanStructure(new Uint8Array(await res.blob.arrayBuffer())));
   const data = await readExif(res.blob);
   renderGroups(left, groupFields(data), { selectable: false });
   if (!groupFields(data).length) {
