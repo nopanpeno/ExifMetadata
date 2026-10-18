@@ -37,7 +37,7 @@ export function scanJpeg(u8) {
     const size = len - 2;
     if (marker === 0xe1) {
       if (startsWith(u8, d, 'Exif\0\0')) {
-        if (!exifSeen && exifIsOrientationOnly(u8)) add(kept, 'exif-orientation', 'EXIF hanya berisi orientasi foto', size);
+        if (!exifSeen && exifIsOrientationOnly(u8)) add(kept, 'exif-orientation', 'EXIF kosong atau hanya berisi orientasi foto', size);
         else add(found, 'exif', 'EXIF', size);
         exifSeen = true;
       } else if (startsWith(u8, d, 'http://ns.adobe.com/xap/1.0/')) add(found, 'xmp', 'XMP', size);

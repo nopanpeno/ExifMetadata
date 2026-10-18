@@ -177,3 +177,15 @@ input[type=checkbox] { border: 2px solid color-mix(in srgb, var(--muted) 60%, tr
 input[type=checkbox]:disabled { border-color: transparent; }
 
 .scanlist { margin: 8px 0 0; padding: 12px 16px 12px 34px; border-radius: 14px; box-shadow: var(--in-s); color: var(--danger); font-weight: 700; }
+
+/* Panel lokasi */
+.mapbox h2 { display: flex; gap: 8px; align-items: center; color: var(--danger); }
+.mapbox h2 svg { flex: none; }
+.coords { font-size: 1.25rem; font-variant-numeric: tabular-nums; margin: 6px 0 10px; }
+.gps-details { margin: 0 0 14px; }
+.gps-details:empty { display: none; }
+.gps-details .row { grid-template-columns: minmax(110px, 30%) 1fr; }
+.gps-actions { display: flex; flex-wrap: wrap; gap: 12px; margin: 4px 0 6px; }
+.btn.plain { color: var(--accent); background: var(--base); font-weight: 700; }
+#btn-map { margin: 12px 0 6px; width: 100%; }
+@media (max-width: 480px) { .gps-actions > * { flex: 1 1 100%; } .gps-details .row { grid-template-columns: 1fr; } }
