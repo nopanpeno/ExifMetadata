@@ -40,3 +40,7 @@ Build produksi memasang Content-Security-Policy: browser hanya boleh memuat berk
 1. Di GitHub: Settings → Pages → Source: **GitHub Actions**.
 2. Setiap push ke `main` menjalankan tes, build, lalu deploy (`.github/workflows/pages.yml`).
 3. `.github/workflows/ci.yml` menjalankan tes dan build di setiap PR.
+
+## Verifikasi dengan ExifTool
+
+`npm test` ikut menjalankan `test/exiftool.test.js`. ExifTool (dipasang lewat devDependency `exiftool-vendored`, versi dikunci, butuh Perl di Linux/macOS) membaca file hasil dan harus menemukan nol metadata foto. Data uji disisipi XMP, IPTC, komentar, dan data setelah akhir gambar. Ini pembanding independen dari kode alat ini sendiri, dan jalan di CI pada setiap PR.
