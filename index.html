@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="Lihat dan hapus metadata EXIF foto langsung di browser. Foto tidak keluar dari perangkatmu." />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 16 16%27%3E%3Crect width=%2716%27 height=%2716%27 rx=%273%27 fill=%27%231f6f5c%27/%3E%3Ccircle cx=%278%27 cy=%278%27 r=%274%27 fill=%27white%27/%3E%3C/svg%3E" />
     <title>EXIF Viewer dan Cleaner</title>
     <link rel="stylesheet" href="/src/style.css" />
   </head>
@@ -24,7 +25,21 @@
           <img id="preview" alt="Pratinjau foto" />
           <div id="meta"></div>
         </div>
+        <div id="toolbar" class="toolbar">
+          <button id="btn-all" class="primary" type="button">Hapus semua metadata</button>
+          <button id="btn-sel" type="button" disabled>Hapus yang dicentang (0)</button>
+          <button id="btn-sens" type="button">Centang field sensitif</button>
+          <label id="orient-wrap" class="orient"><input id="orient" type="checkbox" checked /> Pertahankan orientasi foto</label>
+        </div>
+        <p id="note" class="note"></p>
         <div id="groups"></div>
+      </section>
+      <section id="done" class="done" hidden>
+        <h2>Hasil</h2>
+        <p id="done-info"></p>
+        <a id="download" class="btn" download>Unduh foto bersih</a>
+        <h3>Metadata yang masih tersisa</h3>
+        <div id="left"></div>
       </section>
     </main>
     <script type="module" src="/src/main.js"></script>
