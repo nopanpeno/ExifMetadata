@@ -11,11 +11,14 @@
   <body>
     <header class="top">
       <h1>EXIF Viewer dan Cleaner</h1>
-      <p class="privacy">Foto tidak keluar dari perangkatmu. Semua diproses di browser ini.</p>
+      <p class="privacy"><svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 5 6v6c0 4.5 3 7.5 7 9 4-1.5 7-4.5 7-9V6z"/><path d="m9 12 2 2 4-4"/></svg> Foto tidak keluar dari perangkatmu. Semua diproses di browser ini.</p>
     </header>
     <main>
       <label id="dropzone" class="dropzone" tabindex="0">
         <input id="file" type="file" accept="image/jpeg,image/png,image/webp,image/tiff,image/heic,.jpg,.jpeg,.png,.webp,.tif,.tiff,.heic" hidden />
+        <span class="up-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4"/><path d="m6.5 9.5 5.5-5.5 5.5 5.5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>
+        </span>
         <strong>Seret foto ke sini</strong>
         <span>atau klik untuk memilih file (JPEG, PNG, WebP, TIFF, HEIC)</span>
       </label>
