@@ -1,0 +1,64 @@
+:root {
+  --bg: #fafaf7;
+  --fg: #1c1c1a;
+  --muted: #6b6b66;
+  --line: #e2e1da;
+  --accent: #1f6f5c;
+  --danger: #b3261e;
+  --danger-bg: #fdecea;
+  color-scheme: light dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #161715;
+    --fg: #ecebe6;
+    --muted: #9a9a93;
+    --line: #2d2e2a;
+    --accent: #5cc4a8;
+    --danger: #ff8a80;
+    --danger-bg: #3a1f1d;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font: 16px/1.5 system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+.top, main { max-width: 760px; margin: 0 auto; padding: 0 16px; }
+.top { padding-top: 32px; }
+h1 { margin: 0 0 4px; font-size: 1.6rem; }
+.privacy { margin: 0 0 24px; color: var(--accent); font-weight: 600; }
+.dropzone {
+  display: grid; gap: 4px; justify-items: center; text-align: center;
+  padding: 40px 16px; border: 2px dashed var(--line); border-radius: 12px;
+  cursor: pointer;
+}
+.dropzone span { color: var(--muted); font-size: .9rem; }
+.dropzone:hover, .dropzone:focus-visible, .dropzone.over {
+  border-color: var(--accent); outline: none;
+}
+#status { min-height: 1.5em; color: var(--muted); }
+.summary { display: flex; gap: 16px; align-items: center; margin: 16px 0; }
+.summary img { width: 120px; height: 120px; object-fit: cover; border-radius: 8px; }
+.fname { margin: 0; font-weight: 600; word-break: break-all; }
+.fsize { margin: 0; color: var(--muted); }
+.warn {
+  padding: 10px 12px; border-radius: 8px;
+  background: var(--danger-bg); color: var(--danger); font-weight: 600;
+}
+.group h2 { font-size: 1.05rem; margin: 24px 0 8px; }
+dl { margin: 0; border-top: 1px solid var(--line); }
+.row {
+  display: grid; grid-template-columns: minmax(110px, 38%) 1fr; gap: 12px;
+  padding: 8px 4px; border-bottom: 1px solid var(--line);
+}
+dt { color: var(--muted); font-size: .9rem; word-break: break-word; }
+dd { margin: 0; word-break: break-word; }
+.row.sensitive { background: var(--danger-bg); }
+.row.sensitive dt, .row.sensitive dd { color: var(--danger); font-weight: 600; }
+.empty { color: var(--muted); }
+@media (max-width: 480px) {
+  .row { grid-template-columns: 1fr; gap: 0; }
+}
