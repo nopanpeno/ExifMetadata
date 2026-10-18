@@ -14,6 +14,13 @@ it('baca JPEG contoh dengan GPS', async () => {
   expect(ids).toContain('perangkat');
 });
 
+it('tanggal tampil sesuai isi file, bukan UTC', async () => {
+  const buf = readFileSync(new URL('./fixtures/sample.jpg', import.meta.url));
+  const data = await readExif(buf);
+  const f = groupFields(data).flatMap((g) => g.fields).find((x) => x.key === 'DateTimeOriginal');
+  expect(f.value).toBe('2026-01-02 03:04:05');
+});
+
 it('PNG tanpa EXIF tidak punya GPS atau perangkat', async () => {
   const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==', 'base64');
   const data = await readExif(png);

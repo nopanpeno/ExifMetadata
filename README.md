@@ -29,3 +29,13 @@ Mati bawaan. Jika foto punya GPS, tombol "Nyalakan peta" memuat Leaflet dan ubin
 ## Foto contoh untuk tes
 
 `python3 test/fixtures/make.py` (butuh Pillow) membuat ulang foto di `test/fixtures/`.
+
+## Keamanan jaringan
+
+Build produksi memasang Content-Security-Policy: browser hanya boleh memuat berkas dari situs sendiri dan gambar ubin dari `tile.openstreetmap.org`. `connect-src` hanya `'self'`, jadi skrip tidak bisa mengirim foto ke luar.
+
+## Deploy
+
+1. Di GitHub: Settings → Pages → Source: **GitHub Actions**.
+2. Setiap push ke `main` menjalankan tes, build, lalu deploy (`.github/workflows/pages.yml`).
+3. `.github/workflows/ci.yml` menjalankan tes dan build di setiap PR.

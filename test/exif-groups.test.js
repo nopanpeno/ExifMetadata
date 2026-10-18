@@ -25,7 +25,7 @@ describe('isSensitive', () => {
 describe('formatValue', () => {
   it('ubah tipe ke teks', () => {
     expect(formatValue(null)).toBe('');
-    expect(formatValue(new Date('2026-01-02T03:04:05Z'))).toBe('2026-01-02T03:04:05.000Z');
+    expect(formatValue(new Date(2026, 0, 2, 3, 4, 5))).toBe('2026-01-02 03:04:05');
     expect(formatValue([1, 2])).toBe('1, 2');
     expect(formatValue(new Uint8Array(4))).toBe('[data biner 4 byte]');
     expect(formatValue(1.5)).toBe('1.5');

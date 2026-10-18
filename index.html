@@ -42,13 +42,24 @@
         <div id="groups"></div>
       </section>
       <section id="done" class="done" hidden>
-        <h2>Hasil</h2>
+        <h2 id="done-title" tabindex="-1">Hasil</h2>
         <p id="done-info"></p>
         <a id="download" class="btn" download>Unduh foto bersih</a>
         <h3>Metadata yang masih tersisa</h3>
         <div id="left"></div>
       </section>
     </main>
+    <noscript><p class="warn">Alat ini butuh JavaScript untuk memproses foto di browser kamu.</p></noscript>
+    <footer class="foot">
+      <h2>Batasan</h2>
+      <ul>
+        <li>Hapus per field hanya untuk JPEG. PNG dan WebP: hapus semua lewat gambar ulang.</li>
+        <li>HEIC dan TIFF belum bisa dibersihkan.</li>
+        <li>XMP dan IPTC hanya hilang lewat "Hapus semua".</li>
+        <li>Selalu cek daftar metadata sisa sebelum membagikan foto.</li>
+      </ul>
+      <p>Kode sumber terbuka: <a href="https://github.com/nopanpeno/ExifMetadata">github.com/nopanpeno/ExifMetadata</a></p>
+    </footer>
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>

@@ -181,7 +181,9 @@ async function finish(res) {
     left.replaceChildren(el('p', 'ok', 'Tidak ada metadata yang terbaca. Foto bersih.'));
   }
   done.hidden = false;
-  done.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  done.scrollIntoView({ behavior: calm ? 'auto' : 'smooth', block: 'start' });
+  $('done-title').focus({ preventScroll: true });
 }
 
 async function run(job) {
