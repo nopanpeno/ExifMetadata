@@ -25,6 +25,13 @@
           <img id="preview" alt="Pratinjau foto" />
           <div id="meta"></div>
         </div>
+        <section id="mapbox" class="mapbox" hidden>
+          <h2>Lokasi foto</h2>
+          <p id="coords" class="coords"></p>
+          <p class="note">Peta dimatikan secara bawaan. Jika dinyalakan, browser meminta ubin peta ke OpenStreetMap, jadi mereka bisa tahu area yang kamu lihat. Fotonya tidak dikirim.</p>
+          <button id="btn-map" type="button">Nyalakan peta</button>
+          <div id="map" class="map" hidden></div>
+        </section>
         <div id="toolbar" class="toolbar">
           <button id="btn-all" class="primary" type="button">Hapus semua metadata</button>
           <button id="btn-sel" type="button" disabled>Hapus yang dicentang (0)</button>

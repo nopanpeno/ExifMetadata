@@ -4,7 +4,7 @@ import { readExif } from '../src/exif-read.js';
 import { groupFields, hasGps } from '../src/exif-groups.js';
 
 it('baca JPEG contoh dengan GPS', async () => {
-  const buf = readFileSync(new URL('./sample.jpg', import.meta.url));
+  const buf = readFileSync(new URL('./fixtures/sample.jpg', import.meta.url));
   const data = await readExif(buf);
   expect(data.Model).toBe('TestModel');
   expect(hasGps(data)).toBe(true);

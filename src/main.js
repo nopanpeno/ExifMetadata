@@ -1,5 +1,6 @@
 import { readExif } from './exif-read.js';
-import { groupFields } from './exif-groups.js';
+import { groupFields, hasGps } from './exif-groups.js';
+import { showMap, formatCoords } from './map.js';
 import { cleanAll, cleanSelected, removableKeys, cleanName } from './clean.js';
 import { isJpeg } from './jpeg.js';
 
@@ -21,6 +22,38 @@ const done = $('done');
 const doneInfo = $('done-info');
 const download = $('download');
 const left = $('left');
+const mapbox = $('mapbox');
+const mapEl = $('map');
+const btnMap = $('btn-map');
+const coordsEl = $('coords');
+
+let destroyMap = null;
+let gps = null;
+
+function resetMap() {
+  destroyMap?.();
+  destroyMap = null;
+  mapEl.hidden = true;
+  btnMap.textContent = 'Nyalakan peta';
+  btnMap.disabled = false;
+}
+
+btnMap.addEventListener('click', async () => {
+  if (destroyMap) return resetMap();
+  btnMap.disabled = true;
+  btnMap.textContent = 'Memuat peta...';
+  try {
+    mapEl.hidden = false;
+    destroyMap = await showMap(mapEl, gps.lat, gps.lon);
+    btnMap.textContent = 'Matikan peta';
+  } catch (err) {
+    console.error(err);
+    resetMap();
+    setStatus('Gagal memuat peta.');
+  } finally {
+    btnMap.disabled = false;
+  }
+});
 
 const state = { file: null, removable: new Set(), jpeg: false, urls: { preview: null, out: null } };
 
@@ -111,6 +144,10 @@ async function handle(file) {
       el('p', 'fname', file.name),
       el('p', 'fsize', `${(file.size / 1024 / 1024).toFixed(2)} MB`),
     );
+    resetMap();
+    gps = hasGps(data) ? { lat: data.latitude, lon: data.longitude } : null;
+    mapbox.hidden = !gps;
+    if (gps) coordsEl.textContent = formatCoords(gps.lat, gps.lon);
     renderGroups(groupsEl, groupFields(data), { selectable: state.jpeg });
     orientWrap.hidden = !state.jpeg;
     btnSel.hidden = btnSens.hidden = !state.jpeg;

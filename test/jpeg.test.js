@@ -7,8 +7,8 @@ import {
 } from '../src/jpeg.js';
 
 const load = (n) => new Uint8Array(readFileSync(new URL(`./${n}`, import.meta.url)));
-const sample = load('sample.jpg');
-const rot = load('sample-rot.jpg');
+const sample = load('fixtures/sample.jpg');
+const rot = load('fixtures/sample-rot.jpg');
 
 function withSegment(u8, marker, payload) {
   const len = payload.length + 2;
@@ -78,5 +78,50 @@ describe('removeFieldsJpeg', () => {
     const data = await readExif(removeFieldsJpeg(sample, ['latitude']));
     expect(hasGps(data)).toBe(false);
     expect(data.Make).toBe('TestMake');
+  });
+});
+
+describe('foto contoh tambahan', () => {
+  const prog = load('fixtures/progressive-icc-gps.jpg');
+  const noExif = load('fixtures/no-exif.jpg');
+  const ser = load('fixtures/serial-owner.jpg');
+
+  const indexOfSeq = (u8, a, b) => {
+    for (let i = 0; i < u8.length - 1; i++) if (u8[i] === a && u8[i + 1] === b) return i;
+    return -1;
+  };
+  const sofStart = (u8) => Math.max(indexOfSeq(u8, 0xff, 0xc0), indexOfSeq(u8, 0xff, 0xc2));
+
+  it('progresif: data gambar sama persis, ICC tetap ada, GPS hilang', async () => {
+    const before = await readExif(prog);
+    expect(before.latitude).toBeLessThan(0); // selatan
+    expect(before.longitude).toBeLessThan(0); // barat
+    const out = stripAllMetadata(prog);
+    expect(Buffer.from(out.subarray(sofStart(out))).equals(Buffer.from(prog.subarray(sofStart(prog))))).toBe(true);
+    expect(Buffer.from(out).includes('ICC_PROFILE')).toBe(true);
+    const after = await readExif(out);
+    expect(hasGps(after)).toBe(false);
+    expect(after.Make).toBeUndefined();
+  });
+
+  it('tanpa EXIF: aman diproses, hasil sama dengan masukan', () => {
+    const out = stripAllMetadata(noExif);
+    expect(Buffer.from(out).equals(Buffer.from(noExif))).toBe(true);
+    expect(listRemovable(noExif).size).toBe(0);
+  });
+
+  it('nomor seri dan pemilik bisa dibuang selektif', async () => {
+    const names = listRemovable(ser);
+    expect(names.has('BodySerialNumber')).toBe(true);
+    expect(names.has('CameraOwnerName')).toBe(true);
+    const out = removeFieldsJpeg(ser, ['BodySerialNumber', 'CameraOwnerName']);
+    const data = await readExif(out);
+    expect(data.BodySerialNumber).toBeUndefined();
+    expect(data.CameraOwnerName).toBeUndefined();
+    expect(data.Make).toBe('SerMake');
+  });
+
+  it('hapus terpilih tanpa EXIF tidak error', () => {
+    expect(() => removeFieldsJpeg(noExif, ['Model'])).not.toThrow();
   });
 });
