@@ -21,7 +21,7 @@ npm run build   # hasil di dist/
 - **Hapus terpilih** (JPEG): buang field EXIF yang dicentang. XMP dan IPTC hanya hilang lewat Hapus semua.
 - **PNG, WebP**: gambar ulang lewat canvas. WebP bisa sedikit turun kualitas.
 - Hanya JPEG, PNG, dan WebP yang diterima. HEIC dan TIFF belum didukung.
-- Setelah proses, alat membaca ulang EXIF dengan `exifr`; ini bukan jaminan bahwa setiap jenis metadata lain sudah hilang. Untuk kebutuhan privasi sensitif, verifikasi hasil dengan alat metadata independen.
+- Setelah proses, alat memindai struktur file hasil (segmen JPEG, chunk PNG dan WebP) untuk mencari wadah metadata yang tersisa, lalu membaca ulang EXIF dengan `exifr`; ini bukan jaminan bahwa setiap jenis metadata lain sudah hilang. Untuk kebutuhan privasi sensitif, verifikasi hasil dengan alat metadata independen.
 
 ## Peta GPS
 

@@ -175,3 +175,5 @@ input[type=checkbox]:disabled { box-shadow: none; opacity: .4; cursor: not-allow
 .done .group { padding: 0; box-shadow: none; margin: 16px 0; }
 input[type=checkbox] { border: 2px solid color-mix(in srgb, var(--muted) 60%, transparent); }
 input[type=checkbox]:disabled { border-color: transparent; }
+
+.scanlist { margin: 8px 0 0; padding: 12px 16px 12px 34px; border-radius: 14px; box-shadow: var(--in-s); color: var(--danger); font-weight: 700; }

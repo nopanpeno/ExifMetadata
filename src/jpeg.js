@@ -163,3 +163,20 @@ export function removeFieldsJpeg(u8, keys) {
   const exifBin = piexif.dump(ex);
   return toBytes(piexif.insert(exifBin, piexif.remove(bin)));
 }
+
+// Isi blok EXIF: apakah hanya Orientation? Dipakai pemindai struktur.
+// Gagal parse dianggap berisi (lebih aman).
+export function exifIsOrientationOnly(u8) {
+  try {
+    const ex = piexif.load(toBin(u8));
+    if (ex.thumbnail) return false;
+    for (const ifd of ['0th', 'Exif', 'GPS', 'Interop', '1st']) {
+      for (const id of Object.keys(ex[ifd] || {})) {
+        if (!(ifd === '0th' && Number(id) === piexif.ImageIFD.Orientation)) return false;
+      }
+    }
+    return true;
+  } catch {
+    return false;
+  }
+}
