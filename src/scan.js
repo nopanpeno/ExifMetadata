@@ -4,6 +4,7 @@
 //   found = wadah metadata yang masih ada (perlu perhatian)
 //   kept  = bagian yang sengaja dipertahankan dan tidak berisiko (ICC, orientasi)
 import { exifIsOrientationOnly } from './jpeg.js';
+import { isOrientationOnlyTiff } from './orient.js';
 
 const ascii = (u8, start, len) => String.fromCharCode(...u8.subarray(start, start + len));
 const startsWith = (u8, at, text) => ascii(u8, at, text.length) === text;
@@ -85,7 +86,10 @@ export function scanPng(u8) {
     const next = i + 12 + len;
     if (next > u8.length) return { format: 'png', found, kept, error: true };
     if (PNG_TEXT[type]) add(found, type, `${PNG_TEXT[type]} (${type})`, len);
-    else if (type === 'eXIf') add(found, 'eXIf', 'EXIF (eXIf)', len);
+    else if (type === 'eXIf') {
+      if (isOrientationOnlyTiff(u8.subarray(i + 8, i + 8 + len))) add(kept, 'exif-orientation', 'EXIF hanya berisi orientasi foto', len);
+      else add(found, 'eXIf', 'EXIF (eXIf)', len);
+    }
     else if (type === 'tIME') add(found, 'tIME', 'Waktu modifikasi (tIME)', len);
     else if (type === 'iCCP') add(kept, 'icc', 'Profil warna ICC', len);
     if (type === 'IEND') {
@@ -107,7 +111,8 @@ export function scanWebp(u8) {
   while (i + 8 <= riffEnd) {
     const type = ascii(u8, i, 4);
     const len = (u8[i + 4] | (u8[i + 5] << 8) | (u8[i + 6] << 16) | (u8[i + 7] << 24)) >>> 0;
-    if (WEBP_FOUND[type]) add(found, type.trim(), `${WEBP_FOUND[type]} (${type.trim()})`, len);
+    if (type === 'EXIF' && isOrientationOnlyTiff(u8.subarray(i + 8, i + 8 + len))) add(kept, 'exif-orientation', 'EXIF hanya berisi orientasi foto', len);
+    else if (WEBP_FOUND[type]) add(found, type.trim(), `${WEBP_FOUND[type]} (${type.trim()})`, len);
     else if (type === 'ICCP') add(kept, 'icc', 'Profil warna ICC', len);
     i += 8 + len + (len & 1);
   }
