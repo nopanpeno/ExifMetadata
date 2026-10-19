@@ -1,4 +1,6 @@
 import { isJpeg, cleanAllJpeg, removeFieldsJpeg, listRemovable } from './jpeg.js';
+import { stripPng } from './png.js';
+import { stripWebp } from './webp.js';
 
 export async function fileBytes(file) {
   return new Uint8Array(await file.arrayBuffer());
@@ -25,43 +27,24 @@ function formatFromBytes(bytes) {
 }
 
 // Kenali format dari signature file agar MIME/ekstensi yang keliru tidak
-// membuat format yang belum didukung masuk ke jalur pembersihan canvas.
+// membuat format yang belum didukung masuk ke jalur pembersihan.
 export async function detectFormat(file) {
   return formatFromBytes(new Uint8Array(await file.slice(0, 12).arrayBuffer()));
 }
 
-// PNG, WebP: gambar ulang lewat canvas. Metadata hilang, kualitas WebP bisa turun.
-async function canvasClean(file, format) {
-  const type = format === 'webp' ? 'image/webp' : 'image/png';
-  let bmp;
-  try {
-    bmp = await createImageBitmap(file);
-  } catch {
-    throw new Error('Browser tidak bisa membuka format ini. Coba JPEG, PNG, atau WebP.');
-  }
-  const canvas = document.createElement('canvas');
-  canvas.width = bmp.width;
-  canvas.height = bmp.height;
-  canvas.getContext('2d').drawImage(bmp, 0, 0);
-  bmp.close?.();
-  const blob = await new Promise((r) => canvas.toBlob(r, type, 1));
-  if (!blob) throw new Error('Gagal membuat file baru.');
-  return { blob, ext: type === 'image/webp' ? 'webp' : 'png', lossy: type === 'image/webp', redrawn: true };
+// Inti sinkron (bisa dites di Node): hapus semua metadata tanpa mengubah piksel.
+export function cleanBytes(bytes, { keepOrientation = true } = {}) {
+  const format = formatFromBytes(bytes.subarray(0, 12));
+  if (format === 'jpeg') return { bytes: cleanAllJpeg(bytes, { keepOrientation }), ext: 'jpg', mime: 'image/jpeg' };
+  if (format === 'png') return { bytes: stripPng(bytes, { keepOrientation }), ext: 'png', mime: 'image/png' };
+  if (format === 'webp') return { bytes: stripWebp(bytes, { keepOrientation }), ext: 'webp', mime: 'image/webp' };
+  throw new Error('Format belum didukung. Pilih JPEG, PNG, atau WebP.');
 }
 
-// Hapus semua metadata. Hasil: { blob, ext, lossy }
-export async function cleanAll(file, { keepOrientation = true } = {}) {
-  const bytes = await fileBytes(file);
-  const format = formatFromBytes(bytes.subarray(0, 12));
-  if (format === 'jpeg') {
-    return {
-      blob: new Blob([cleanAllJpeg(bytes, { keepOrientation })], { type: 'image/jpeg' }),
-      ext: 'jpg',
-      lossy: false,
-    };
-  }
-  if (!format) throw new Error('Format belum didukung. Pilih JPEG, PNG, atau WebP.');
-  return canvasClean(file, format);
+// Hapus semua metadata. Hasil: { blob, ext, lossy: false } (selalu tanpa gambar ulang).
+export async function cleanAll(file, opts = {}) {
+  const r = cleanBytes(await fileBytes(file), opts);
+  return { blob: new Blob([r.bytes], { type: r.mime }), ext: r.ext, lossy: false };
 }
 
 // Hapus field terpilih (JPEG saja).

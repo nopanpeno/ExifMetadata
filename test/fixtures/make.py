@@ -44,3 +44,20 @@ ex[0x010F] = 'GpsMake'
 ex[0x8825] = {1: 'S', 2: (R(6), R(12), R(0)), 3: 'E', 4: (R(106), R(48), R(0)), 5: 0, 6: R(1234, 10),
               7: (R(3), R(4), R(5)), 12: 'K', 13: R(40), 16: 'T', 17: R(90), 29: '2026:01:02', 31: R(5)}
 im6.save(f'{d}/gps-detail.jpg', exif=ex, quality=90)
+
+# 7) PNG dan WebP (dibuat sekali lalu dikomit; nilai acak bisa berbeda saat dibuat ulang)
+from PIL import PngImagePlugin, ImageCms
+XMP = ('<x:xmpmeta xmlns:x="adobe:ns:meta/"><rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">'
+       '<rdf:Description rdf:about="" xmlns:dc="http://purl.org/dc/elements/1.1/"><dc:creator><rdf:Seq><rdf:li>Budi</rdf:li></rdf:Seq></dc:creator>'
+       '</rdf:Description></rdf:RDF></x:xmpmeta>')
+icc = ImageCms.ImageCmsProfile(ImageCms.createProfile('sRGB')).tobytes()
+exif = Image.Exif(); exif[0x010F] = 'PngMake'; exif[0x0112] = 6
+exif[0x8825] = {1: 'S', 2: (6.0, 12.0, 0.0), 3: 'E', 4: (106.0, 48.0, 0.0)}
+ia = Image.effect_noise((64, 48), 60).convert('RGBA')
+info = PngImagePlugin.PngInfo(); info.add_text('Author', 'Budi'); info.add_text('Comment', 'rahasia'); info.add_itxt('XML:com.adobe.xmp', XMP)
+ia.save(f'{d}/meta.png', pnginfo=info, exif=exif, icc_profile=icc)
+Image.effect_noise((64, 48), 80).convert('RGB').save(f'{d}/plain.png')
+Image.effect_noise((64, 48), 80).convert('RGB').save(f'{d}/meta.webp', quality=80, exif=exif, xmp=XMP.encode(), icc_profile=icc)
+ia.save(f'{d}/alpha.webp', lossless=True, exif=exif)
+fr = [Image.effect_noise((32, 32), s).convert('RGB') for s in (40, 80, 120)]
+fr[0].save(f'{d}/anim.webp', save_all=True, append_images=fr[1:], duration=100, loop=0, exif=exif)

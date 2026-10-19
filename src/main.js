@@ -18,7 +18,6 @@ const btnAll = $('btn-all');
 const btnSel = $('btn-sel');
 const btnSens = $('btn-sens');
 const orient = $('orient');
-const orientWrap = $('orient-wrap');
 const note = $('note');
 const done = $('done');
 const doneInfo = $('done-info');
@@ -185,14 +184,13 @@ async function handle(file) {
     mapbox.hidden = !gps;
     if (gps) renderGps(data);
     renderGroups(groupsEl, groupFields(data), { selectable: state.jpeg });
-    orientWrap.hidden = !state.jpeg;
-    btnSel.hidden = btnSens.hidden = !state.jpeg;
+        btnSel.hidden = btnSens.hidden = !state.jpeg;
     const groupsNow = groupFields(data);
     note.textContent = state.jpeg
       ? groupsNow.length && removable.size === 0
         ? 'Field di file ini tidak bisa dihapus satu per satu (EXIF tidak terbaca oleh pembersih, atau hanya XMP/IPTC). Pakai "Hapus semua".'
         : 'Field XMP dan IPTC tidak bisa dicentang satu per satu. Pakai "Hapus semua" untuk membuangnya.'
-      : 'Format ini hanya mendukung "Hapus semua" lewat gambar ulang. Hasil WebP bisa sedikit turun kualitas.';
+      : 'Format ini hanya mendukung "Hapus semua". Metadata dibuang dari file, piksel tidak diubah.';
     updateSelButton();
     result.hidden = false;
     setStatus('');

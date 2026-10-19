@@ -8,6 +8,7 @@ import { exiftool } from 'exiftool-vendored';
 import piexif from 'piexifjs';
 import { cleanAllJpeg, removeFieldsJpeg } from '../src/jpeg.js';
 import { scanStructure } from '../src/scan.js';
+import { cleanBytes } from '../src/clean.js';
 import { dirty } from './helpers.js';
 
 const dir = mkdtempSync(join(tmpdir(), 'exif-'));
@@ -20,8 +21,8 @@ const fixtureDir = new URL('./fixtures/', import.meta.url);
 const jpegs = readdirSync(fixtureDir).filter((n) => n.endsWith('.jpg'));
 
 let n = 0;
-async function inspect(bytes) {
-  const file = join(dir, `t${n++}.jpg`);
+async function inspect(bytes, ext = 'jpg') {
+  const file = join(dir, `t${n++}.${ext}`);
   writeFileSync(file, bytes);
   const tags = await exiftool.readRaw(file, ['-a', '-G1', '-s']);
   const names = Object.keys(tags).filter((k) => !['SourceFile', 'errors', 'warnings'].includes(k));
@@ -114,5 +115,57 @@ describe('pemindai vs ExifTool pada hasil Hapus semua', () => {
       expect(scanStructure(out).found).toEqual([]);
       expect(bad((await inspect(out)).names)).toEqual([]);
     }
+  });
+});
+
+// ---- PNG dan WebP: dibersihkan tanpa gambar ulang ----
+// Tag teknis wadah yang boleh ada. Selain ini (Author, Comment, Software, tIME, EXIF, XMP...) tidak boleh.
+const PNG_OK = new Set(['ImageWidth', 'ImageHeight', 'BitDepth', 'ColorType', 'Compression', 'Filter', 'Interlace', 'ProfileName']);
+const badMedia = (names) =>
+  names.filter((k) => {
+    const [g, t] = k.split(':');
+    if (isOkGroup(k)) return false;
+    if (g === 'PNG') return !PNG_OK.has(t);
+    if (g.startsWith('PNG-')) return false; // gAMA, pHYs, sRGB, dll: info tampilan
+    if (g === 'RIFF') return false; // dimensi, versi codec, bendera, animasi
+    return true;
+  });
+
+describe('ExifTool membaca PNG dan WebP hasil Hapus semua', () => {
+  for (const [name, ext] of [['meta.png', 'png'], ['meta.webp', 'webp'], ['alpha.webp', 'webp'], ['anim.webp', 'webp']]) {
+    it(`${name}: bersih menurut ExifTool, tanpa warning`, async () => {
+      const src = new Uint8Array(readFileSync(new URL(name, fixtureDir)));
+      const before = await inspect(src, ext);
+      expect(before.groups.has('IFD0')).toBe(true); // data uji memang kotor
+      expect(before.groups.has('GPS')).toBe(true);
+      if (name === 'meta.png') {
+        expect(before.names).toContain('PNG:Author');
+        expect(before.groups.has('XMP-dc')).toBe(true);
+      }
+      if (name === 'meta.webp') expect(before.groups.has('XMP-dc')).toBe(true);
+
+      const out = cleanBytes(src, { keepOrientation: false }).bytes;
+      const after = await inspect(out, ext);
+      expect(badMedia(after.names)).toEqual([]);
+      expect(after.problems).toEqual([]);
+      expect(scanStructure(out).found).toEqual([]);
+    });
+  }
+
+  it('orientasi dipertahankan: hanya IFD0:Orientation, GPS dan Make hilang', async () => {
+    for (const [name, ext] of [['meta.png', 'png'], ['alpha.webp', 'webp']]) {
+      const src = new Uint8Array(readFileSync(new URL(name, fixtureDir)));
+      const after = await inspect(cleanBytes(src, { keepOrientation: true }).bytes, ext);
+      expect(badMedia(after.names)).toEqual(['IFD0:Orientation']);
+      expect(after.tags['IFD0:Orientation']).toBe('Rotate 90 CW');
+      expect(after.problems).toEqual([]);
+    }
+  });
+
+  it('profil warna ICC tetap ada pada PNG dan WebP', async () => {
+    const png = await inspect(cleanBytes(new Uint8Array(readFileSync(new URL('meta.png', fixtureDir))), { keepOrientation: false }).bytes, 'png');
+    const webp = await inspect(cleanBytes(new Uint8Array(readFileSync(new URL('meta.webp', fixtureDir))), { keepOrientation: false }).bytes, 'webp');
+    expect(png.names).toContain('ICC_Profile:ProfileDescription');
+    expect(webp.names).toContain('ICC_Profile:ProfileDescription');
   });
 });
