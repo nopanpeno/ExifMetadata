@@ -28,6 +28,8 @@ export function isSensitive(key) {
 
 export function formatValue(v) {
   if (v === null || v === undefined) return '';
+  // Jangan tampilkan nilai metadata numerik yang rusak.
+  if (typeof v === 'number' && !Number.isFinite(v)) return '';
   if (v instanceof Date) {
     if (Number.isNaN(v.getTime())) return '';
     // exifr membuat Date lokal dari teks tanpa zona; tampilkan apa adanya, bukan UTC.
@@ -37,7 +39,7 @@ export function formatValue(v) {
   if (v instanceof Uint8Array || v instanceof ArrayBuffer) {
     return `[data biner ${v.byteLength} byte]`;
   }
-  if (Array.isArray(v)) return v.map(formatValue).join(', ');
+  if (Array.isArray(v)) return v.map(formatValue).filter(Boolean).join(', ');
   if (typeof v === 'object') return JSON.stringify(v);
   return String(v);
 }

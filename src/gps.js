@@ -30,8 +30,13 @@ function refValue(v) {
 }
 
 function timeText(v) {
-  if (Array.isArray(v)) return v.map((n) => String(Math.trunc(n)).padStart(2, '0')).join(':');
-  if (typeof v === 'string') return v.split(':').map((n) => n.padStart(2, '0')).join(':');
+  if (Array.isArray(v)) {
+    if (v.length !== 3 || !v.every((n) => typeof n === 'number' && Number.isFinite(n))) return null;
+    return v.map((n) => String(Math.trunc(n)).padStart(2, '0')).join(':');
+  }
+  if (typeof v === 'string' && /^\d{1,2}:\d{1,2}:\d{1,2}$/.test(v)) {
+    return v.split(':').map((n) => n.padStart(2, '0')).join(':');
+  }
   return null;
 }
 
@@ -55,7 +60,9 @@ export function gpsDetails(data) {
   }
   const acc = num(data.GPSHPositioningError);
   if (acc !== null) rows.push({ label: 'Akurasi', value: `sekitar ${round1(acc)} m` });
-  const date = typeof data.GPSDateStamp === 'string' ? data.GPSDateStamp.replaceAll(':', '-') : null;
+  const date = typeof data.GPSDateStamp === 'string' && /^\d{4}:\d{2}:\d{2}$/.test(data.GPSDateStamp)
+    ? data.GPSDateStamp.replaceAll(':', '-')
+    : null;
   const time = timeText(data.GPSTimeStamp);
   if (date || time) rows.push({ label: 'Waktu GPS', value: [date, time].filter(Boolean).join(' ') + ' UTC' });
   return rows;

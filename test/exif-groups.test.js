@@ -29,6 +29,9 @@ describe('formatValue', () => {
     expect(formatValue([1, 2])).toBe('1, 2');
     expect(formatValue(new Uint8Array(4))).toBe('[data biner 4 byte]');
     expect(formatValue(1.5)).toBe('1.5');
+    expect(formatValue(Number.NaN)).toBe('');
+    expect(formatValue(Number.POSITIVE_INFINITY)).toBe('');
+    expect(formatValue([1, Number.NaN, 2])).toBe('1, 2');
   });
 });
 
