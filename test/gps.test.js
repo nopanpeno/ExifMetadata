@@ -54,6 +54,12 @@ describe('gpsDetails', () => {
   it('nilai bukan angka diabaikan', () => {
     expect(gpsDetails({ GPSAltitude: 'x', GPSSpeed: NaN, GPSImgDirection: null })).toEqual([]);
   });
+  it('waktu GPS rusak tidak menampilkan NaN', () => {
+    expect(gpsDetails({ GPSDateStamp: 'NaN:NaN:NaN', GPSTimeStamp: [NaN, 2, 3] })).toEqual([]);
+    expect(gpsDetails({ GPSDateStamp: '2026:01:02', GPSTimeStamp: [NaN, 2, 3] })).toEqual([
+      { label: 'Waktu GPS', value: '2026-01-02 UTC' },
+    ]);
+  });
 });
 
 describe('akurasi', () => {
