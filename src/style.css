@@ -1,34 +1,23 @@
 /* Neumorphism: permukaan satu warna, bentuk dari cahaya dan bayangan.
    Teks dan status penting tetap berkontras tinggi; bayangan hanya untuk bentuk. */
 :root {
-  --base: #e3e8ef;
-  --light: #ffffff;
-  --dark: #bcc5d3;
-  --fg: #1d2433;
-  --muted: #566075;
-  --accent: #17695a;
+  /* Palet Bauhaus klasik: hitam, putih tulang, merah, biru, kuning */
+  --base: #f4f1ea;
+  --light: #f4f1ea;
+  --dark: #111111;
+  --fg: #111111;
+  --muted: #4a4a4a;
+  --accent: #1d4e89;
   --accent-fg: #ffffff;
-  --danger: #a31f19;
-  --danger-tint: rgba(163, 31, 25, 0.07);
+  --danger: #d62828;
+  --danger-tint: rgba(214, 40, 40, 0.08);
+  --yellow: #f2b705;
   --r: 20px;
   --out: 9px 9px 18px var(--dark), -9px -9px 18px var(--light);
   --out-s: 5px 5px 10px var(--dark), -5px -5px 10px var(--light);
   --in: inset 6px 6px 12px var(--dark), inset -6px -6px 12px var(--light);
   --in-s: inset 3px 3px 6px var(--dark), inset -3px -3px 6px var(--light);
-  color-scheme: light dark;
-}
-@media (prefers-color-scheme: dark) {
-  :root {
-    --base: #22262e;
-    --light: #2c313b;
-    --dark: #181b21;
-    --fg: #e8ebf0;
-    --muted: #a3acba;
-    --accent: #5fcab0;
-    --accent-fg: #0d1f1b;
-    --danger: #ff9d94;
-    --danger-tint: rgba(255, 140, 130, 0.09);
-  }
+  color-scheme: light;
 }
 * { box-sizing: border-box; }
 body {
