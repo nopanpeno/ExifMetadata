@@ -207,3 +207,11 @@ input[type=checkbox]:checked::after { border-color: var(--accent-fg); }
 .warn, .scanlist, .row.sensitive { border-color: var(--danger); }
 .mapbox { border-color: var(--danger); background: var(--base); }
 .row.sensitive { box-shadow: inset 6px 0 0 var(--danger); }
+
+/* Bauhaus: footer blok hitam, mobile tetap tegas */
+.foot { background: var(--dark); color: var(--base); padding: 24px; margin-top: 48px; max-width: none; }
+.foot h2, .foot a { color: var(--yellow); }
+@media (max-width: 480px) {
+  h1 { font-size: 1.6rem; }
+  .group, .mapbox, .done { border-width: 3px; }
+}
