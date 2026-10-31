@@ -12,11 +12,11 @@
   --danger: #d62828;
   --danger-tint: rgba(214, 40, 40, 0.08);
   --yellow: #f2b705;
-  --r: 20px;
-  --out: 9px 9px 18px var(--dark), -9px -9px 18px var(--light);
-  --out-s: 5px 5px 10px var(--dark), -5px -5px 10px var(--light);
-  --in: inset 6px 6px 12px var(--dark), inset -6px -6px 12px var(--light);
-  --in-s: inset 3px 3px 6px var(--dark), inset -3px -3px 6px var(--light);
+  --r: 0px;
+  --out: none;
+  --out-s: none;
+  --in: none;
+  --in-s: none;
   color-scheme: light;
 }
 * { box-sizing: border-box; }
@@ -178,3 +178,9 @@ input[type=checkbox]:disabled { border-color: transparent; }
 .btn.plain { color: var(--accent); background: var(--base); font-weight: 700; }
 #btn-map { margin: 12px 0 6px; width: 100%; }
 @media (max-width: 480px) { .gps-actions > * { flex: 1 1 100%; } .gps-details .row { grid-template-columns: 1fr; } }
+
+/* Bauhaus: tanpa bayangan, bentuk dari garis tebal hitam */
+button, .btn, .group, .dropzone, .summary img, .privacy, dl, .warn, .ok, .scanlist, .mapbox, .done, input[type=checkbox] {
+  border: 3px solid var(--dark);
+}
+input[type=checkbox] { border-radius: 0; }
