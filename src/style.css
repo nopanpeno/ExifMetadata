@@ -202,3 +202,8 @@ input[type=checkbox]:checked::after { border-color: var(--accent-fg); }
 .dropzone { background: #ffffff; }
 .top { border-bottom: 6px solid var(--dark); margin-bottom: 24px; }
 .privacy { background: var(--yellow); color: var(--fg); }
+
+/* Bauhaus: merah hanya untuk peringatan privasi, tidak untuk hiasan */
+.warn, .scanlist, .row.sensitive { border-color: var(--danger); }
+.mapbox { border-color: var(--danger); background: var(--base); }
+.row.sensitive { box-shadow: inset 6px 0 0 var(--danger); }
